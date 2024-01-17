@@ -133,6 +133,8 @@ mp_ancestor_nodes <- get_ancestor_nodes(ancestors)
 
 # export files ------------------------------------------------------------
 
+## be careful with this directory
+
 mp_dir <-  "./data/"
 
 files_to_export <- list(mp_description,
