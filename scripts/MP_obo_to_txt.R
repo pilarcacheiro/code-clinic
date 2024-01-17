@@ -133,6 +133,10 @@ mp_ancestor_nodes <- get_ancestor_nodes(ancestors)
 
 # export files ------------------------------------------------------------
 
+# To create a data folder automatically, or any other folder
+data <- "data"
+dir.create(file.path("./", data), showWarnings = FALSE)
+
 mp_dir <-  "./data/"
 
 files_to_export <- list(mp_description,
