@@ -24,14 +24,17 @@ library("Hmisc")
 
 # get ontology ------------------------------------------------------------
 
-mp <- get_ontology("http://www.informatics.jax.org/downloads/reports/MPheno_OBO.ontology")
+mp <- get_ontology(
+  "http://www.informatics.jax.org/downloads/reports/MPheno_OBO.ontology"
+)
 
 ## mp ids and descriptions
 
 mp_description <- data.frame(
   mp_term = as.character(row.names(as.data.frame(mp[[2]]))),
   mp_description = as.character(as.data.frame(mp[[2]])[, 1]),
-  stringsAsFactors = F)
+  stringsAsFactors = FALSE
+)
 
 ## parents, children and all the ancestors for a given mp term as a list
 
@@ -43,80 +46,83 @@ ancestors <- mp[[5]]
 # set of functions to convert these lists to data frames ------------------
 
 get_parent_nodes <- function(parents) {
-  
+
   mp_term <- list()
-  mp_parents <-list()
-  
-  for(i in 1:length(names(parents))) {
-    
+  mp_parents <- list()
+
+  for (i in 1:length(names(parents))) {
+
     mp_term [[i]] <- names(parents)[i]
     mp_parents[[i]] <- paste(parents[[i]], collapse = ",")
   }
-  
+
   mp_parents <- data.frame(
     mp_term = do.call(rbind, mp_term),
-    mp_parents = do.call(rbind, mp_parents), stringsAsFactors = F) %>%
-    mutate(mp_parents = strsplit(as.character(mp_parents),",")) %>%
+    mp_parents = do.call(rbind, mp_parents), stringsAsFactors = FALSE
+  ) %>%
+    mutate(mp_parents = strsplit(as.character(mp_parents), ",")) %>%
     unnest(mp_parents) %>%
     filter(mp_term != mp_parents)
-  
+
   return(mp_parents)
-  
+
 }
 
 
-## get children nodes 
+## get children nodes
 
-get_children_nodes <- function(children){
-  
+get_children_nodes <- function(children) {
+
   mp_term <- list()
   mp_children <- list()
-  
-  for(i in 1:length(names(children))) {
-    
+
+  for (i in 1:length(names(children))) {
+
     mp_term [[i]] <- names(children)[i]
     mp_children[[i]] <- paste(children[[i]], collapse = ",")
   }
-  
+
   mp_children <- data.frame(
-    mp_term = do.call(rbind, mp_term), 
-    mp_children = do.call(rbind, mp_children), stringsAsFactors = F) %>%
+    mp_term = do.call(rbind, mp_term),
+    mp_children = do.call(rbind, mp_children), stringsAsFactors = FALSE
+  ) %>%
     mutate(mp_children = strsplit(as.character(mp_children), ",")) %>%
     unnest(mp_children) %>%
     filter(mp_term != mp_children)
-  
+
   return(mp_children)
 }
 
 
-## get all the ancestors/ top levels 
+## get all the ancestors/ top levels
 
 get_ancestor_nodes <- function(ancestors) {
-  
+
   mp_term <- list()
   mp_ancestors <- list()
-  
-  for(i in 1:length(names(ancestors))) {
-    
+
+  for (i in 1:length(names(ancestors))) {
+
     mp_term [[i]] <- names(ancestors)[i]
     mp_ancestors[[i]] <- paste(ancestors[[i]], collapse = ",")
   }
-  
+
   mp_ancestors <- data.frame(
     mp_term = do.call(rbind, mp_term),
-    mp_ancestors = do.call(rbind, mp_ancestors), stringsAsFactors = F) %>%
+    mp_ancestors = do.call(rbind, mp_ancestors), stringsAsFactors = FALSE
+  ) %>%
     mutate(mp_ancestors = strsplit(as.character(mp_ancestors), ",")) %>%
     unnest(mp_ancestors) %>%
     filter(mp_term != mp_ancestors)
-  
+
   return(mp_ancestors)
 }
 
-## get top levels 
+## get top levels
 
 mp_toplevels <- get_parent_nodes(parents) %>%
   filter(mp_parents == "MP:0000001") %>%
-  left_join(mp_description, by="mp_term") %>%
+  left_join(mp_description, by = "mp_term") %>%
   select(mp_term, mp_description)
 
 
@@ -138,20 +144,20 @@ mp_dir <-  "./data/"
 files_to_export <- list(mp_description,
                         mp_parental_nodes,
                         mp_children_nodes,
-                        mp_ancestor_nodes, 
+                        mp_ancestor_nodes,
                         mp_toplevels)
 
 names(files_to_export) <- Cs(mp_description,
                              mp_parental_nodes,
                              mp_children_nodes,
-                             mp_ancestor_nodes, 
+                             mp_ancestor_nodes,
                              mp_toplevels)
 
 
 for (i in 1:length(files_to_export)){
-  
-  write.table(files_to_export[[i]], 
-              paste0(mp_dir, names(files_to_export)[i],".txt"), 
-              quote = F, sep = "\t", row.names = FALSE)
-  
+
+  write.table(files_to_export[[i]],
+              paste0(mp_dir, names(files_to_export)[i], ".txt"),
+              quote = FALSE, sep = "\t", row.names = FALSE)
+
 }
