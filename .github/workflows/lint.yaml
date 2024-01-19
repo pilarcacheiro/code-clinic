@@ -21,7 +21,7 @@ jobs:
           use-public-rspm: true
 
       - name: Install packages
-        run: install.packages("dplyr", "Hmisc", "lintr", "ontologyIndex", "tidyr")
+        run: install.packages(c("dplyr", "Hmisc", "lintr", "ontologyIndex", "tidyr"))
         shell: Rscript {0}
 
       - name: Lint root directory
